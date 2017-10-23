@@ -1,0 +1,25 @@
+{
+  "name": "user_activity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oblako4/user_activity.git"
+  },
+  "keywords": [
+    "[]"
+  ],
+  "author": "Elena Bartosh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Oblako4/user_activity/issues"
+  },
+  "homepage": "https://github.com/Oblako4/user_activity#readme"
+}
