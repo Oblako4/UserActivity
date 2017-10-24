@@ -1,0 +1,34 @@
+{
+  "name": "UserActivity",
+  "version": "1.0.0",
+  "description": "User activity module for Oblako4",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=6.11.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node": "^8.3.0",
+    "underscore": "^1.8.3",
+    "bluebird": "^3.5.0",
+    "express": "^4.15.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oblako4/user_activity.git"
+  },
+  "keywords": [
+    "[]"
+  ],
+  "author": "Elena Bartosh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Oblako4/user_activity/issues"
+  },
+  "homepage": "https://github.com/Oblako4/user_activity#readme"
+}
