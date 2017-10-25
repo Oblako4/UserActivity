@@ -71,7 +71,7 @@ CREATE TABLE user_order (
   billing_address_id INT NOT NULL,
   delivery_type ENUM('next_day', 'standard', 'expedited'),
   delivery_cost INT DEFAULT 0,
-  total_price DECIMAL(7, 2) NOT NULL,
+  total_price DECIMAL(7, 2) DEFAULT 0,
   PRIMARY KEY (id),
   FOREIGN KEY (user_id) REFERENCES user(id),
   FOREIGN KEY (card_id) REFERENCES card(id),
@@ -104,7 +104,7 @@ CREATE TABLE search_result (
   search_id INT NOT NULL,
   item_id INT NOT NULL,
   position INT NOT NULL,
-  clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  clicked_at TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (search_id) REFERENCES search(id)
 );
