@@ -65,7 +65,7 @@ $(document).ready(function() {
     var data = JSON.stringify({userId, cardId, shippingAddressId, billingAddressId, deliveryType, deliveryCost});
     return $.ajax({
       type: 'POST',
-      url: 'userorder/order',
+      url: 'userorder',
       data: data,
       contentType: 'application/json',
       dataType: 'json'
@@ -89,7 +89,29 @@ $(document).ready(function() {
     });
   };
 
-  $('#profile').click(function() {
+  var placeUserOrder = (orderId) => {
+    var data = JSON.stringify({orderId});
+    return $.ajax({
+      type: 'POST',
+      url: 'userorder/place',
+      data: data,
+      contentType: 'application/json',
+      dataType: 'json'
+    });
+  };
+
+  var getUserOrderWithDetails = (orderId) => {
+    var data = {orderId: orderId};
+    return $.ajax({
+      type: 'GET',
+      url: 'userorder',
+      data: data,
+      contentType: 'application/json',
+      dataType: 'json'
+    });
+  };
+
+  $('#profile').click(() => {
     var count = Number($('#quantity').val());
     var data;
     var user;
@@ -127,17 +149,28 @@ $(document).ready(function() {
         .then((result) => {
           item = result[0];
           console.log('item:', item);
-          //orderId, itemId, quantity, listedPrice
           return createOrderItem(order.id);
         })
-        .done((result) => {
+        .then((result) => {
           item = result[0];
           console.log('item:', item);
+          return placeUserOrder(order.id);
+        })
+        .done((result) => {
+          order = result[0];
+          console.log('order:', order);
         })
         .fail((error) => {
           console.error(error);
         });
     }
+  });
+  $('#user_order').click(() => {
+    var userOrderId = Number($('#user_order_id').val());
+    return getUserOrderWithDetails(userOrderId)
+      .then((result) => {
+        console.log(result);
+      });
   });
 });
 

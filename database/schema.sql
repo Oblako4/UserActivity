@@ -63,7 +63,7 @@ CREATE TABLE user_order (
   id INT NOT NULL AUTO_INCREMENT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  purchased_at TIMESTAMP NULL,
   user_id INT NOT NULL,
   status ENUM('in_process', 'placed'),
   card_id INT NOT NULL,
