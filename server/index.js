@@ -9,8 +9,10 @@ app.use(bodyParser.json());
 app.use(express.static(__dirname + '/../client'));
 
 var routeProfile = require('../routes/profile');
+var routeUserOrder = require('../routes/userorder');
 
 app.use('/profile', routeProfile);
+app.use('/userorder', routeUserOrder);
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {

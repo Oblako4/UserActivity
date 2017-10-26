@@ -27,6 +27,11 @@ var createUser = (firstName, lastName, email, phone, password) => {
   return connection.queryAsync(query);
 };
 
+var getUser = (userId) => {
+  var query = `SELECT id, first_name, last_name, email, phone FROM user WHERE id=${userId}`;
+  return connection.queryAsync(query);
+};
+
 var createLogin = (userId, deviceName, deviceOS) => {
   var query = `INSERT INTO login (user_id, device_name, device_os)
     VALUES ('${userId}', '${deviceName}', '${deviceOS}')`;
@@ -39,9 +44,19 @@ var createAddress = (userId, name, street, city, state, country, zip, type, isDe
   return connection.queryAsync(query);
 };
 
+var getAddress = (addressId) => {
+  var query = `SELECT * FROM address WHERE id=${addressId}`;
+  return connection.queryAsync(query);
+};
+
 var createCard = (userId, num, expires, holder, billingAddressId, cvc, isDefault = 0) => {
   var query = `INSERT INTO card (user_id, num, expires, holder, billing_address_id, cvc, is_default)
     VALUES ('${userId}', '${num}', '${expires}', '${holder}', '${billingAddressId}', '${cvc}', '${isDefault}')`;
+  return connection.queryAsync(query);
+};
+
+var getCard = (cardId) => {
+  var query = `SELECT * FROM card WHERE id=${cardId}`;
   return connection.queryAsync(query);
 };
 
@@ -51,9 +66,19 @@ var createUserOrder = (userId, cardId, shippingAddressId, billingAddressId, deli
   return connection.queryAsync(query);
 };
 
+var getUserOrder = (userOrderId) => {
+  var query = `SELECT * FROM user_order WHERE id=${userOrderId}`;
+  return connection.queryAsync(query);
+};
+
 var createOrderItem = (orderId, itemId, quantity, listedPrice) => {
   var query = `INSERT INTO order_item (order_id, item_id, quantity, listed_price)
     VALUES ('${orderId}', '${itemId}', '${quantity}', '${listedPrice}')`;
+  return connection.queryAsync(query);
+};
+
+var getOrderItem = (userOrderItemId) => {
+  var query = `SELECT * FROM order_item WHERE id=${userOrderItemId}`;
   return connection.queryAsync(query);
 };
 
@@ -114,11 +139,16 @@ var createSearchResult = (searchId, itemId, position) => {
 
 module.exports = {
   createUser,
+  getUser,
   createLogin,
   createAddress,
+  getAddress,
   createCard,
+  getCard,
   createUserOrder,
+  getUserOrder,
   createOrderItem,
+  getOrderItem,
   createSearch,
   createSearchResult
 };
