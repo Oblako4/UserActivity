@@ -10,10 +10,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "chai": "^4.1.2",
     "express": "^4.15.0",
     "faker": "^4.1.0",
     "moment": "^2.19.1",
@@ -35,6 +36,7 @@
   },
   "homepage": "https://github.com/Oblako4/user_activity#readme",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "mocha": "^4.0.1"
   }
 }
