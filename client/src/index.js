@@ -44,8 +44,7 @@ $(document).ready(function() {
     var data = JSON.stringify({
       userId: userId,
       num: faker.finance.account(16),
-      //expires: moment(faker.date.between('2017-07-25', '2018-10-25')).format('YYYY-MM-DD'),
-      expires: '2018-09-01',
+      expires: moment(faker.date.between('2017-07-25', '2018-10-25')).format('YYYY-MM-DD'),
       holder: firstName + ' ' + lastName,
       billingAddressId: billingAddressId,
       cvc: faker.random.number({min: 100, max: 999}),
