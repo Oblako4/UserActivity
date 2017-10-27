@@ -113,13 +113,13 @@ $(document).ready(function() {
 
   $('#profile').click(() => {
     var count = Number($('#quantity').val());
-    var data;
-    var user;
-    var shippingAddress;
-    var billingAddress;
-    var card;
-    var order;
-    for (var i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
+      let data;
+      let user;
+      let shippingAddress;
+      let billingAddress;
+      let card;
+      let order;
       createUser()
         .then((result) => {
           user = result[0];
@@ -157,7 +157,6 @@ $(document).ready(function() {
           return placeUserOrder(order.id);
         })
         .done((result) => {
-          order = result[0];
           console.log('order:', order);
         })
         .fail((error) => {

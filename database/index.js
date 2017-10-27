@@ -73,7 +73,7 @@ var getUserOrder = (userOrderId) => {
 
 var placeUserOrder = (orderId) => {
   var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-  var query = `UPDATE user_order SET status="placed", updated_at="${date}", purchased_at="${date}" WHERE id=${orderId}`;
+  var query = `UPDATE user_order SET status="placed", purchased_at="${date}" WHERE id=${orderId}`;
   return connection.queryAsync(query);
 };
 
@@ -103,8 +103,7 @@ var getUserOrderWithDetails = (orderId) => {
       resultOrder = {
         'id': order.id,
         'user_id': order.user_id,
-        'purchased_at': order.purchased_at,
-        'total_price': order.total_price};
+        'purchased_at': order.purchased_at};
       return getCard(order.card_id);
     })
     .then((result) => {
@@ -143,8 +142,12 @@ var getUserOrderWithDetails = (orderId) => {
       return getOrderItems(order.id);
     })
     .then((result) => {
+      var totalPrice = result.reduce((acc, item) => {
+        return acc + item.quantity * item.listed_price;
+      }, 0);
       resultOrder['items'] = result;
       resultObj['order'] = resultOrder;
+      resultObj['total_price'] = totalPrice;
       return Promise.resolve(resultObj);
     })
     .catch((error) => {
