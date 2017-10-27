@@ -44,8 +44,7 @@ $(document).ready(function() {
     var data = JSON.stringify({
       userId: userId,
       num: faker.finance.account(16),
-      //expires: moment(faker.date.between('2017-07-25', '2018-10-25')).format('YYYY-MM-DD'),
-      expires: '2018-09-01',
+      expires: moment(faker.date.between('2017-07-25', '2018-10-25')).format('YYYY-MM-DD'),
       holder: firstName + ' ' + lastName,
       billingAddressId: billingAddressId,
       cvc: faker.random.number({min: 100, max: 999}),
@@ -65,7 +64,7 @@ $(document).ready(function() {
     var data = JSON.stringify({userId, cardId, shippingAddressId, billingAddressId, deliveryType, deliveryCost});
     return $.ajax({
       type: 'POST',
-      url: 'userorder/order',
+      url: 'userorder',
       data: data,
       contentType: 'application/json',
       dataType: 'json'
@@ -89,15 +88,37 @@ $(document).ready(function() {
     });
   };
 
-  $('#profile').click(function() {
+  var placeUserOrder = (orderId) => {
+    var data = JSON.stringify({orderId});
+    return $.ajax({
+      type: 'POST',
+      url: 'userorder/place',
+      data: data,
+      contentType: 'application/json',
+      dataType: 'json'
+    });
+  };
+
+  var getUserOrderWithDetails = (orderId) => {
+    var data = {orderId: orderId};
+    return $.ajax({
+      type: 'GET',
+      url: 'userorder',
+      data: data,
+      contentType: 'application/json',
+      dataType: 'json'
+    });
+  };
+
+  $('#profile').click(() => {
     var count = Number($('#quantity').val());
-    var data;
-    var user;
-    var shippingAddress;
-    var billingAddress;
-    var card;
-    var order;
-    for (var i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
+      let data;
+      let user;
+      let shippingAddress;
+      let billingAddress;
+      let card;
+      let order;
       createUser()
         .then((result) => {
           user = result[0];
@@ -127,17 +148,27 @@ $(document).ready(function() {
         .then((result) => {
           item = result[0];
           console.log('item:', item);
-          //orderId, itemId, quantity, listedPrice
           return createOrderItem(order.id);
         })
-        .done((result) => {
+        .then((result) => {
           item = result[0];
           console.log('item:', item);
+          return placeUserOrder(order.id);
+        })
+        .done((result) => {
+          console.log('order:', order);
         })
         .fail((error) => {
           console.error(error);
         });
     }
+  });
+  $('#user_order').click(() => {
+    var userOrderId = Number($('#user_order_id').val());
+    return getUserOrderWithDetails(userOrderId)
+      .then((result) => {
+        console.log(result);
+      });
   });
 });
 

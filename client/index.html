@@ -3,15 +3,22 @@
 <head>
   <title>User Activity</title>
   <script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
-  <script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
-  <script type='text/javascript' src='src/faker.js'></script>
+  <script type='text/javascript' src='src/lib/moment.js'></script>
+  <script type='text/javascript' src='src/lib/faker.js'></script>
   <script src='/src/index.js'></script>
 </head>
 <body>
-<div id='app'>
+<div id='generate'>
 	Number of users:
 	<input id='quantity' type='text' value='1'><br>
   <input id='profile' type='submit' value='Generate users with orders'><br>
+</div>
+<br>
+<br>
+<div id='get_information'>
+	User order id:
+	<input id='user_order_id' type='text'><br>
+  <input id='user_order' type='submit' value='Get information'><br>
 </div>
 </body>
 </html>

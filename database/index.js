@@ -71,6 +71,12 @@ var getUserOrder = (userOrderId) => {
   return connection.queryAsync(query);
 };
 
+var placeUserOrder = (orderId) => {
+  var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+  var query = `UPDATE user_order SET status="placed", purchased_at="${date}" WHERE id=${orderId}`;
+  return connection.queryAsync(query);
+};
+
 var createOrderItem = (orderId, itemId, quantity, listedPrice) => {
   var query = `INSERT INTO order_item (order_id, item_id, quantity, listed_price)
     VALUES ('${orderId}', '${itemId}', '${quantity}', '${listedPrice}')`;
@@ -81,6 +87,110 @@ var getOrderItem = (userOrderItemId) => {
   var query = `SELECT * FROM order_item WHERE id=${userOrderItemId}`;
   return connection.queryAsync(query);
 };
+
+var getOrderItems = (orderId) => {
+  var query = `SELECT * FROM order_item WHERE order_id=${orderId}`;
+  return connection.queryAsync(query);
+};
+
+var getUserOrderWithDetails = (orderId) => {
+  var resultObj = {};
+  var resultOrder = {};
+  var order;
+  return getUserOrder(orderId)
+    .then((result) => {
+      order = result[0];
+      resultOrder = {
+        'id': order.id,
+        'user_id': order.user_id,
+        'purchased_at': order.purchased_at};
+      return getCard(order.card_id);
+    })
+    .then((result) => {
+      var card = result[0];
+      resultOrder['card'] = {};
+      resultOrder['card'].id = card.id;
+      resultOrder['card'].num = card.num;
+      return getAddress(order.billing_address_id);
+    })
+    .then((result) => {
+      var billingAddress = result[0];
+      resultOrder['billing_address'] = {};
+      resultOrder['billing_address'] = {
+        'id': billingAddress.id,
+        'name': billingAddress.name,
+        'street': billingAddress.street,
+        'city': billingAddress.city,
+        'state': billingAddress.state,
+        'country': billingAddress.country,
+        'zip': billingAddress.zip
+      };
+      return getAddress(order.shipping_address_id);
+    })
+    .then((result) => {
+      var shippingAddress = result[0];
+      resultOrder['shipping_address'] = {};
+      resultOrder['shipping_address'] = {
+        'id': shippingAddress.id,
+        'name': shippingAddress.name,
+        'street': shippingAddress.street,
+        'city': shippingAddress.city,
+        'state': shippingAddress.state,
+        'country': shippingAddress.country,
+        'zip': shippingAddress.zip
+      };
+      return getOrderItems(order.id);
+    })
+    .then((result) => {
+      var totalPrice = result.reduce((acc, item) => {
+        return acc + item.quantity * item.listed_price;
+      }, 0);
+      resultOrder['items'] = result;
+      resultObj['order'] = resultOrder;
+      resultObj['total_price'] = totalPrice;
+      return Promise.resolve(resultObj);
+    })
+    .catch((error) => {
+      console.error('getUserOrderWithDetails error:', error);
+    });
+};
+
+//{"order":
+//  {"id":2,
+//   "user_id":2,
+//   "purchased_at":"2017-10-26T19:09:13.000Z",
+//   "total_price":0,
+//   "card": {"id":2,
+//     "num":"0472389144657800"},
+//   "billing_address":{"id":4,
+//     "name":"Carmen Yundt",
+//     "street":"56330 Weber Stravenue Apt. 551",
+//     "city":"Sengertown",
+//     "state":"OH",
+//     "country":"USA",
+//     "zip":"49667-4393"},
+//   "shipping_address":{"id":4,
+//     "name":"Carmen Yundt",
+//     "street":"56330 Weber Stravenue Apt. 551",
+//     "city":"Sengertown",
+//     "state":"OH",
+//     "country":"USA",
+//     "zip":"49667-4393"},
+//   "items": [
+//     {"id":3,
+//      "created_at":"2017-10-26T19:09:13.000Z",
+//      "order_id":2,
+//      "item_id":9437,
+//      "quantity":1,
+//      "listed_price":94.81},
+//     {"id":4,
+//      "created_at":"2017-10-26T19:09:13.000Z",
+//      "order_id":2,
+//      "item_id":7209,
+//      "quantity":3,
+//      "listed_price":75.03}
+//    ]
+//}}
 
 var createSearch = (userId, query) => {
   var query = `INSERT INTO search (user_id, query)
@@ -94,49 +204,6 @@ var createSearchResult = (searchId, itemId, position) => {
   return connection.queryAsync(query);
 };
 
-//test data structure
-//var userId;
-// var billingAddressId;
-// var shippingAddressId;
-// var cardId;
-// var searchId;
-// createUser('Ivan', 'Ivanov', 'eqre@gmail.com', '6692379977', 'password111')
-//   .then((result) => {
-//     console.log(result);
-//     userId = result.insertId;
-//     return createLogin(userId, 'MAC book pro', 'Mac OS');
-//   })
-//   .then((result) => {
-//     return createAddress(userId, 'Ivan Ivanov', '944 Market street', 'San Francisco', 'CA', 'USA', '95122', 'shipping', 1);
-//   })
-//   .then((result) => {
-//     shippingAddressId = result.insertId;
-//     return createAddress(userId, 'Ivan Ivanov', '944 Market street', 'San Francisco', 'CA', 'USA', '95122', 'billing', 1);
-//   })
-//   .then((result) => {
-//     billingAddressId = result.insertId;
-//     return createCard(userId, '6677009988990011', '2017-09-01', 'Ivan Ivanov', billingAddressId, 453, 1);
-//   })
-//   .then((result) => {
-//     cardId = result.insertId;
-//     return createUserOrder(userId, cardId, shippingAddressId, billingAddressId, 'standard', 0);
-//   })
-//   .then((result) => {
-//     orderId = result.insertId;
-//     return createOrderItem(orderId, 9943, 1, 5634.0);
-//   })
-//   .then((result) => {
-//     return createSearch(userId, 'black t-shirt');
-//   })
-//   .then((result) => {
-//     searchId = result.insertId;
-//     return createSearchResult(searchId, 9943, 1);
-//   })
-//   .catch((error) => {
-//     console.error('Test data generation error', error);
-//   });
-
-
 module.exports = {
   createUser,
   getUser,
@@ -147,6 +214,8 @@ module.exports = {
   getCard,
   createUserOrder,
   getUserOrder,
+  getUserOrderWithDetails,
+  placeUserOrder,
   createOrderItem,
   getOrderItem,
   createSearch,

@@ -62,8 +62,7 @@ CREATE TABLE card (
 CREATE TABLE user_order (
   id INT NOT NULL AUTO_INCREMENT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  purchased_at TIMESTAMP NULL,
   user_id INT NOT NULL,
   status ENUM('in_process', 'placed'),
   card_id INT NOT NULL,
@@ -71,7 +70,6 @@ CREATE TABLE user_order (
   billing_address_id INT NOT NULL,
   delivery_type ENUM('next_day', 'standard', 'expedited'),
   delivery_cost INT DEFAULT 0,
-  total_price DECIMAL(7, 2) DEFAULT 0,
   PRIMARY KEY (id),
   FOREIGN KEY (user_id) REFERENCES user(id),
   FOREIGN KEY (card_id) REFERENCES card(id),
