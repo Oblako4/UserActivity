@@ -82,6 +82,7 @@ CREATE TABLE order_item (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   order_id INT NOT NULL,
   item_id INT NOT NULL,
+  seller_id INT NOT NULL,
   quantity INT DEFAULT 1,
   listed_price DECIMAL(7, 2),
   PRIMARY KEY (id),

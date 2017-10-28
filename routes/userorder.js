@@ -30,8 +30,8 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/item', (req, res, next) => {
-  var {orderId, itemId, quantity, listedPrice} = req.body;
-  db.createOrderItem(orderId, itemId, quantity, listedPrice)
+  var {orderId, itemId, sellerId, quantity, listedPrice} = req.body;
+  db.createOrderItem(orderId, itemId, sellerId, quantity, listedPrice)
     .then((result) => {
       return db.getOrderItem(result.insertId);
     })

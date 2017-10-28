@@ -77,9 +77,9 @@ var placeUserOrder = (orderId) => {
   return connection.queryAsync(query);
 };
 
-var createOrderItem = (orderId, itemId, quantity, listedPrice) => {
-  var query = `INSERT INTO order_item (order_id, item_id, quantity, listed_price)
-    VALUES ('${orderId}', '${itemId}', '${quantity}', '${listedPrice}')`;
+var createOrderItem = (orderId, itemId, sellerId, quantity, listedPrice) => {
+  var query = `INSERT INTO order_item (order_id, item_id, seller_id, quantity, listed_price)
+    VALUES ('${orderId}', '${itemId}', '${sellerId}', '${quantity}', '${listedPrice}')`;
   return connection.queryAsync(query);
 };
 
@@ -181,12 +181,14 @@ var getUserOrderWithDetails = (orderId) => {
 //      "created_at":"2017-10-26T19:09:13.000Z",
 //      "order_id":2,
 //      "item_id":9437,
+//      "seller_id":34,
 //      "quantity":1,
 //      "listed_price":94.81},
 //     {"id":4,
 //      "created_at":"2017-10-26T19:09:13.000Z",
 //      "order_id":2,
 //      "item_id":7209,
+//      "seller_id":36,
 //      "quantity":3,
 //      "listed_price":75.03}
 //    ]

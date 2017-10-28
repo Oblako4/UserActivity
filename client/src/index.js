@@ -71,11 +71,12 @@ $(document).ready(function() {
     });
   };
 
-  var createOrderItem = (orderId, itemId) => {
-  //orderId, itemId, quantity, listedPrice
+  var createOrderItem = (orderId) => {
+  //orderId, itemId, sellerId, quantity, listedPrice
     var data = JSON.stringify({
       orderId: orderId,
       itemId: faker.random.number({min: 1, max: 10000}),
+      sellerId: faker.random.number({min: 1, max: 10000}),
       quantity: faker.random.number({min: 1, max: 10}),
       listedPrice: faker.finance.amount(2, 100, 2)
     });
