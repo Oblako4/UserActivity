@@ -21,9 +21,10 @@ mysqlConnection.connect((error) => {
 
 var connection = Promise.promisifyAll(mysqlConnection);
 
-var createUser = (firstName, lastName, email, phone, password) => {
-  var query = `INSERT INTO user (first_name, last_name, email, phone, password)
-    VALUES ('${firstName}', '${lastName}', '${email}', '${phone}', '${password}')`;
+var createUser = (firstName, lastName, email, phone, password, createdAt) => {
+  createdAt = createdAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : createdAt;
+  var query = `INSERT INTO user (first_name, last_name, email, phone, password, created_at)
+    VALUES ('${firstName}', '${lastName}', '${email}', '${phone}', '${password}', '${createdAt}')`;
   return connection.queryAsync(query);
 };
 
@@ -32,15 +33,28 @@ var getUser = (userId) => {
   return connection.queryAsync(query);
 };
 
-var createLogin = (userId, deviceName, deviceOS) => {
-  var query = `INSERT INTO login (user_id, device_name, device_os)
-    VALUES ('${userId}', '${deviceName}', '${deviceOS}')`;
+var createLogin = (userId, loggedInAt, deviceName, deviceOS) => {
+  loggedInAt = loggedInAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : loggedInAt;
+  var query = `INSERT INTO login (user_id, logged_in_at, device_name, device_os)
+    VALUES ('${userId}', '${loggedInAt}' ,'${deviceName}', '${deviceOS}')`;
   return connection.queryAsync(query);
 };
 
-var createAddress = (userId, name, street, city, state, country, zip, type, isDefault = 0) => {
-  var query = `INSERT INTO address (user_id, name, street, city, state, country, zip, type, is_default)
-    VALUES ('${userId}', '${name}', '${street}', '${city}', '${state}', '${country}', '${zip}','${type}','${isDefault}')`;
+var getLogin = (loginId) => {
+  var query = `SELECT * FROM login WHERE id=${loginId}`;
+  return connection.queryAsync(query);
+};
+
+var getLogins = (userId, days) => {
+  var date = moment(Date.now()).subtract(days, 'days').format('YYYY-MM-DD HH:mm:ss');
+  var query = `SELECT * FROM login WHERE user_id=${userId} AND logged_in_at>'${date}'`;
+  return connection.queryAsync(query);
+};
+
+var createAddress = (userId, name, street, city, state, country, zip, createdAt) => {
+  createdAt = createdAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : createdAt;
+  var query = `INSERT INTO address (user_id, name, street, city, state, country, zip, created_at)
+    VALUES ('${userId}', '${name}', '${street}', '${city}', '${state}', '${country}', '${zip}','${createdAt}')`;
   return connection.queryAsync(query);
 };
 
@@ -49,9 +63,10 @@ var getAddress = (addressId) => {
   return connection.queryAsync(query);
 };
 
-var createCard = (userId, num, expires, holder, billingAddressId, cvc, isDefault = 0) => {
-  var query = `INSERT INTO card (user_id, num, expires, holder, billing_address_id, cvc, is_default)
-    VALUES ('${userId}', '${num}', '${expires}', '${holder}', '${billingAddressId}', '${cvc}', '${isDefault}')`;
+var createCard = (userId, num, expires, holder, billingAddressId, cvc, createdAt) => {
+  createdAt = createdAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : createdAt;
+  var query = `INSERT INTO card (user_id, num, expires, holder, billing_address_id, cvc, created_at)
+    VALUES ('${userId}', '${num}', '${expires}', '${holder}', '${billingAddressId}', '${cvc}', '${createdAt}')`;
   return connection.queryAsync(query);
 };
 
@@ -60,9 +75,10 @@ var getCard = (cardId) => {
   return connection.queryAsync(query);
 };
 
-var createUserOrder = (userId, cardId, shippingAddressId, billingAddressId, deliveryType = 'standard', deliveryCost = 0) => {
-  var query = `INSERT INTO user_order (user_id, card_id, shipping_address_id, billing_address_id, delivery_type, delivery_cost)
-    VALUES ('${userId}', '${cardId}', '${shippingAddressId}', '${billingAddressId}', '${deliveryType}', '${deliveryCost}')`;
+var createUserOrder = (userId, cardId, shippingAddressId, billingAddressId, deliveryType = 'standard', deliveryCost = 0, createdAt = undefined) => {
+  createdAt = createdAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : createdAt;
+  var query = `INSERT INTO user_order (user_id, card_id, shipping_address_id, billing_address_id, delivery_type, delivery_cost, created_at)
+    VALUES ('${userId}', '${cardId}', '${shippingAddressId}', '${billingAddressId}', '${deliveryType}', '${deliveryCost}', '${createdAt}')`;
   return connection.queryAsync(query);
 };
 
@@ -71,15 +87,16 @@ var getUserOrder = (userOrderId) => {
   return connection.queryAsync(query);
 };
 
-var placeUserOrder = (orderId) => {
-  var date = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-  var query = `UPDATE user_order SET status="placed", purchased_at="${date}" WHERE id=${orderId}`;
+var placeUserOrder = (orderId, purchasedAt) => {
+  purchasedAt = purchasedAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : purchasedAt;
+  var query = `UPDATE user_order SET status="placed", purchased_at="${purchasedAt}" WHERE id=${orderId}`;
   return connection.queryAsync(query);
 };
 
-var createOrderItem = (orderId, itemId, quantity, listedPrice) => {
-  var query = `INSERT INTO order_item (order_id, item_id, quantity, listed_price)
-    VALUES ('${orderId}', '${itemId}', '${quantity}', '${listedPrice}')`;
+var createOrderItem = (orderId, itemId, sellerId, quantity, listedPrice, createdAt) => {
+  createdAt = createdAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : createdAt;
+  var query = `INSERT INTO order_item (order_id, item_id, seller_id, quantity, listed_price, created_at)
+    VALUES ('${orderId}', '${itemId}', '${sellerId}', '${quantity}', '${listedPrice}', '${createdAt}')`;
   return connection.queryAsync(query);
 };
 
@@ -90,6 +107,13 @@ var getOrderItem = (userOrderItemId) => {
 
 var getOrderItems = (orderId) => {
   var query = `SELECT * FROM order_item WHERE order_id=${orderId}`;
+  return connection.queryAsync(query);
+};
+
+/*random*/
+
+var getRandomUserOrder = () => {
+  var query = 'SELECT * FROM user_order WHERE status="in_progress" ORDER BY RAND() LIMIT 1';
   return connection.queryAsync(query);
 };
 
@@ -181,12 +205,14 @@ var getUserOrderWithDetails = (orderId) => {
 //      "created_at":"2017-10-26T19:09:13.000Z",
 //      "order_id":2,
 //      "item_id":9437,
+//      "seller_id":34,
 //      "quantity":1,
 //      "listed_price":94.81},
 //     {"id":4,
 //      "created_at":"2017-10-26T19:09:13.000Z",
 //      "order_id":2,
 //      "item_id":7209,
+//      "seller_id":36,
 //      "quantity":3,
 //      "listed_price":75.03}
 //    ]
@@ -208,6 +234,9 @@ module.exports = {
   createUser,
   getUser,
   createLogin,
+  getLogin,
+  getLogins,
+  createLogin,
   createAddress,
   getAddress,
   createCard,
@@ -219,6 +248,7 @@ module.exports = {
   createOrderItem,
   getOrderItem,
   createSearch,
-  createSearchResult
+  createSearchResult,
+  getRandomUserOrder
 };
 
