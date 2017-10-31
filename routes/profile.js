@@ -5,10 +5,10 @@ var db = require('../database/index.js');
 
 router.post('/user', (req, res, next) => {
   //need to clean phone numbers
-  var {firstName, lastName, email, phone, password} = req.body;
+  var {firstName, lastName, email, phone, password, createdAt} = req.body;
   firstName = firstName.replace("'", "''");
   lastName = lastName.replace("'", "''");
-  db.createUser(firstName, lastName, email, phone, password)
+  db.createUser(firstName, lastName, email, phone, password, createdAt)
     .then((result) => {
       return db.getUser(result.insertId);
     })
@@ -22,11 +22,11 @@ router.post('/user', (req, res, next) => {
 });
 
 router.post('/address', (req, res, next) => {
-  var {userId, name, street, city, state, country, zip, type} = req.body;
+  var {userId, name, street, city, state, country, zip, createdAt} = req.body;
   name = name.replace("'", "''");
   street = street.replace("'", "''");
   city = city.replace("'", "''");
-  db.createAddress(userId, name, street, city, state, country, zip, type)
+  db.createAddress(userId, name, street, city, state, country, zip, createdAt)
     .then((result) => {
       return db.getAddress(result.insertId);
     })
@@ -40,10 +40,10 @@ router.post('/address', (req, res, next) => {
 });
 
 router.post('/card', (req, res, next) => {
-  //userId, num, expires, holder, billingAddressId, cvc, isDefault = 0
-  var {userId, num, expires, holder, billingAddressId, cvc, isDefault} = req.body;
+  //userId, num, expires, holder, billingAddressId, cvc
+  var {userId, num, expires, holder, billingAddressId, cvc, createdAt} = req.body;
   holder = holder.replace("'", "''");
-  db.createCard(userId, num, expires, holder, billingAddressId, cvc, isDefault)
+  db.createCard(userId, num, expires, holder, billingAddressId, cvc, createdAt)
     .then((result) => {
       return db.getCard(result.insertId);
     })
