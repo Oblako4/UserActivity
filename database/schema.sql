@@ -59,7 +59,7 @@ CREATE TABLE user_order (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   purchased_at TIMESTAMP NULL,
   user_id INT NOT NULL,
-  status ENUM('in_process', 'placed'),
+  status ENUM('in_progress', 'placed') DEFAULT 'in_progress',
   card_id INT NOT NULL,
   shipping_address_id INT NOT NULL,
   billing_address_id INT NOT NULL,

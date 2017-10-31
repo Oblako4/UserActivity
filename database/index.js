@@ -98,6 +98,13 @@ var getOrderItems = (orderId) => {
   return connection.queryAsync(query);
 };
 
+/*random*/
+
+var getRandomUserOrder = () => {
+  var query = 'SELECT * FROM user_order WHERE status="in_progress" ORDER BY RAND() LIMIT 1';
+  return connection.queryAsync(query);
+};
+
 var getUserOrderWithDetails = (orderId) => {
   var resultObj = {};
   var resultOrder = {};
@@ -226,6 +233,7 @@ module.exports = {
   createOrderItem,
   getOrderItem,
   createSearch,
-  createSearchResult
+  createSearchResult,
+  getRandomUserOrder
 };
 

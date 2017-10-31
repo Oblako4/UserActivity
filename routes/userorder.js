@@ -21,7 +21,18 @@ router.get('/', (req, res, next) => {
   var orderId = req.query.orderId;
   db.getUserOrderWithDetails(orderId)
     .then((result) => {
-      res.status(201).json(result);
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json(error);
+    });
+});
+
+router.get('/random', (req, res, next) => {
+  db.getRandomUserOrder()
+    .then((result) => {
+      res.status(200).json(result);
     })
     .catch((error) => {
       console.log(error);
@@ -51,7 +62,7 @@ router.post('/place', (req, res, next) => {
       return db.getUserOrder(orderId);
     })
     .then((result) => {
-      res.status(201).json(result);
+      res.status(200).json(result);
     })
     .catch((error) => {
       console.log(error);
