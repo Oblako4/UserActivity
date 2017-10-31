@@ -33,9 +33,21 @@ var getUser = (userId) => {
   return connection.queryAsync(query);
 };
 
-var createLogin = (userId, deviceName, deviceOS) => {
-  var query = `INSERT INTO login (user_id, device_name, device_os)
-    VALUES ('${userId}', '${deviceName}', '${deviceOS}')`;
+var createLogin = (userId, loggedInAt, deviceName, deviceOS) => {
+  loggedInAt = loggedInAt === undefined ? moment(Date.now()).format('YYYY-MM-DD HH:mm:ss') : loggedInAt;
+  var query = `INSERT INTO login (user_id, logged_in_at, device_name, device_os)
+    VALUES ('${userId}', '${loggedInAt}' ,'${deviceName}', '${deviceOS}')`;
+  return connection.queryAsync(query);
+};
+
+var getLogin = (loginId) => {
+  var query = `SELECT * FROM login WHERE id=${loginId}`;
+  return connection.queryAsync(query);
+};
+
+var getLogins = (userId, days) => {
+  var date = moment(Date.now()).subtract(days, 'days').format('YYYY-MM-DD HH:mm:ss');
+  var query = `SELECT * FROM login WHERE user_id=${userId} AND logged_in_at>'${date}'`;
   return connection.queryAsync(query);
 };
 
@@ -221,6 +233,9 @@ var createSearchResult = (searchId, itemId, position) => {
 module.exports = {
   createUser,
   getUser,
+  createLogin,
+  getLogin,
+  getLogins,
   createLogin,
   createAddress,
   getAddress,

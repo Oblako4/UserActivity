@@ -21,6 +21,34 @@ router.post('/user', (req, res, next) => {
     });
 });
 
+router.post('/login', (req, res, next) => {
+  var {userId, loggedInAt, deviceName, deviceOs} = req.body;
+  db.createLogin(userId, loggedInAt, deviceName, deviceOs)
+    .then((result) => {
+      return db.getLogin(result.insertId);
+    })
+    .then((result) => {
+      res.status(201).json(result);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json(error);
+    });
+});
+
+router.get('/login', (req, res, next) => {
+  var userId = req.query.userId;
+  var days = req.query.days;
+  db.getLogins(userId, days)
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json(error);
+    });
+});
+
 router.post('/address', (req, res, next) => {
   var {userId, name, street, city, state, country, zip, createdAt} = req.body;
   name = name.replace("'", "''");

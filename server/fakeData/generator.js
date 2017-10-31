@@ -8,7 +8,6 @@ process.argv.forEach(function (param, index, array) {
 });
 
 var log = Number(params['log']) || 0;
-var count = Number(params['count']) || 1;
 var repeat = Number(params['repeat']) || 0;
 const periodStart = '2016-10-25';
 const periodEnd = '2017-10-25';
@@ -20,12 +19,11 @@ const moment = require('moment');
 const Promise = require('bluebird');
 const axios = require('axios');
 const cron = require('node-cron');
-const data = require('../../server/fakeData/data');
-const states = data.states;
+const randomData = require('../../server/fakeData/data');
+const states = randomData.states;
+const userAgents = randomData.userAgents;
 
-//var parser = require('ua-parser-js');
-//result = parser(userAgent);
-//console.log(result);
+var parser = require('ua-parser-js');
 
 
 var createUser = (firstName, lastName, email, phone, password, createdAt) => {
@@ -108,6 +106,22 @@ var getUserOrderWithDetails = (orderId) => {
   return axios.get(server + 'userorder/item', data);
 };
 
+var createLogin = (userId, loggedInAt, deviceName, deviceOs) => {
+  loggedInAt = loggedInAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss');
+  var randomNumber = faker.random.number({min: 0, max: userAgents.length - 1});
+  var userAgent = userAgents[randomNumber].useragent;
+  var userAgentObj = parser(userAgent);
+  deviceName = deviceName || ((userAgentObj.device.name || '') + ' ' + (userAgentObj.device.model || ''));
+  deviceOs = deviceOs || ((userAgentObj.os.name || '') + ' ' + (userAgentObj.os.version || ''));
+  var data = {userId, loggedInAt, deviceName, deviceOs};
+  return axios.post(server + 'profile/login', data);
+};
+
+var getLogins = (userId, days) => {
+  var data = {userId, days};
+  return axios.get(server + 'profile/login', data);
+};
+
 var createProfile = (firstName, lastName, email, phone, password, createdAt) => {
   let user;
   let name;
@@ -119,6 +133,9 @@ var createProfile = (firstName, lastName, email, phone, password, createdAt) => 
   return createUser()
     .then((result) => {
       user = result.data[0];
+      createLogin(user.id);
+    })
+    .then((result) => {
       //userId, name, street, city, state, country, zip, createdAt
       name = user.first_name + ' ' + user.last_name;
       return createAddress(user.id, name);
@@ -162,44 +179,42 @@ var placeRandomUserOrder = () => {
     });
 };
 
-var createProfileWithOrder = (count) => {
-  for (let i = 0; i < count; i++) {
-    let user;
-    let shippingAddress;
-    let billingAddress;
-    let card;
-    let order;
-    let name;
-    let item;
-    //firstName, lastName, email, phone, password, createdAt
-    return createProfile()
-      .then((result) => {
-        var data = result.data[0];
-        user = data.user;
-        shippingAddress = data.shippingAddress;
-        billingAddress = data.billingAddress;
-        card = data.card;
-        //userId, cardId, shippingAddressId, billingAddressId, deliveryType = 'standard', deliveryCost = 0, createdAt = undefined
-        return createUserOrder(user.id, card.id, shippingAddress.id, billingAddress.id, 'standard', 0);
-      })
-      .then((result) => {
-        order = result.data[0];
-        //orderId, itemId, sellerId, quantity, listedPrice, createdAt
-        return createOrderItem(order.id);
-      })
-      .then((result) => {
-        item = result.data[0];
-        //orderId, itemId, sellerId, quantity, listedPrice, createdAt
-        return createOrderItem(order.id);
-      });
-  }
+var createProfileWithOrder = () => {
+  let user;
+  let shippingAddress;
+  let billingAddress;
+  let card;
+  let order;
+  let name;
+  let item;
+  //firstName, lastName, email, phone, password, createdAt
+  return createProfile()
+    .then((result) => {
+      var data = result.data[0];
+      user = data.user;
+      shippingAddress = data.shippingAddress;
+      billingAddress = data.billingAddress;
+      card = data.card;
+      //userId, cardId, shippingAddressId, billingAddressId, deliveryType = 'standard', deliveryCost = 0, createdAt = undefined
+      return createUserOrder(user.id, card.id, shippingAddress.id, billingAddress.id, 'standard', 0);
+    })
+    .then((result) => {
+      order = result.data[0];
+      //orderId, itemId, sellerId, quantity, listedPrice, createdAt
+      return createOrderItem(order.id);
+    })
+    .then((result) => {
+      item = result.data[0];
+      //orderId, itemId, sellerId, quantity, listedPrice, createdAt
+      return createOrderItem(order.id);
+    });
 };
 
 if (repeat === 1) {
   cron.schedule('*/10 * * * * *', function() {
-    createProfileWithOrder(count)
+    createProfileWithOrder()
       .then((result) => {
-        console.log('createProfileWithOrder:', result.data[0]);
+        console.log('LOGIN createProfileWithOrder:', result.data[0]);
       })
       .catch((error) => {
         console.log('createProfileWithOrder:', error.message);
@@ -224,11 +239,10 @@ if (repeat === 1) {
       });
   });
 } else {
-  createProfileWithOrder(count);
+  createProfileWithOrder();
   placeRandomUserOrder();
   createRandomOrderItem();
 }
-
 
 
 
