@@ -1,38 +1,23 @@
-// Load the AWS SDK for Node.js
-var AWS = require('aws-sdk');
-// Load credentials and set the region from the JSON file
-AWS.config.loadFromPath(__dirname + '/../messagebus/config/awsconfig.json');
+const AWS = require('aws-sdk');
+const Consumer = require('sqs-consumer');
 const queueConfig = require('../messagebus/config/config.js');
 
-// Create an SQS service object
+AWS.config.loadFromPath(__dirname + '/../messagebus/config/awsconfig.json');
+
 var sqs = new AWS.SQS( {apiVersion: '2012-11-05'} );
 
-// var params = {
-//   DelaySeconds: 10,
-//   MessageAttributes: {
-//     'Title': {
-//       DataType: 'String',
-//       StringValue: 'The Whistler'
-//     },
-//     'Author': {
-//       DataType: 'String',
-//       StringValue: 'John Grisham'
-//     },
-//     'WeeksOn': {
-//       DataType: 'Number',
-//       StringValue: '6'
-//     }
-//   },
-//   MessageBody: 'Information about current NY Times fiction bestseller for week of 12/11/2016.',
-//   QueueUrl: queueConfig.QueueUrl
-// };
+const app = Consumer.create({
+  queueUrl: queueConfig.QueueUrl,
+  handleMessage: (message, done) => {
+    console.log(message);
+    done();
+  },
+  sqs: sqs
+});
 
-// sqs.sendMessage(params, function(err, data) {
-//   if (err) {
-//     console.log("Error", err);
-//   } else {
-//     console.log("Success", data.MessageId);
-//   }
-// });
+app.on('error', (err) => {
+  console.log(err.message);
+});
+app.start();
 
 module.exports = {sqs};
