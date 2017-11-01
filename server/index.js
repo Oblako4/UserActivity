@@ -1,7 +1,7 @@
 var Promise = require('bluebird');
 var express = require('express');
 var bodyParser = require('body-parser');
-var sqs = require('../messagebus/index.js');
+//var sqs = require('../messagebus/index.js');
 
 var app = express();
 

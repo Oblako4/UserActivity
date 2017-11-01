@@ -169,9 +169,15 @@ var getUserOrderWithDetails = (orderId) => {
       var totalPrice = result.reduce((acc, item) => {
         return acc + item.quantity * item.listed_price;
       }, 0);
-      resultOrder['items'] = result;
+      resultOrder['items'] = result.map((item) => {
+        return {'id': item.id,
+          'item_id': item.item_id,
+          'seller_id': item.seller_id,
+          'quantity': item.quantity,
+          'listed_price': item.listed_price};
+      });
+      resultOrder['total_price'] = totalPrice;
       resultObj['order'] = resultOrder;
-      resultObj['total_price'] = totalPrice;
       return Promise.resolve(resultObj);
     })
     .catch((error) => {
@@ -209,8 +215,6 @@ var getUserOrderWithDetails = (orderId) => {
 //      "quantity":1,
 //      "listed_price":94.81},
 //     {"id":4,
-//      "created_at":"2017-10-26T19:09:13.000Z",
-//      "order_id":2,
 //      "item_id":7209,
 //      "seller_id":36,
 //      "quantity":3,
