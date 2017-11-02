@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../database/index.js');
-var sqs = require('../messagebus/index.js');
+var ordersSQS = require('../messagebus/orders.js');
 
 router.post('/', (req, res, next) => {
   var {userId, cardId, shippingAddressId, billingAddressId, deliveryType, deliveryCost, createdAt} = req.body;
@@ -63,22 +63,7 @@ router.post('/place', (req, res, next) => {
       return db.getUserOrderWithDetails(orderId);
     })
     .then((result) => {
-      console.log('getUserOrderWithDetails:', result);
-      var params = {
-        DelaySeconds: 10,
-        MessageAttributes: {},
-        MessageBody: JSON.stringify(result),
-        QueueUrl: sqs.queueUrl
-      };
-      return new Promise((resolve, reject) => {
-        sqs.sqs.sendMessage(params, (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
-          }
-        });
-      });
+      return ordersSQS.sendMessage(result, 'orders');
     })
     .then((result) => {
       console.log('Message sent:', result.MessageId);

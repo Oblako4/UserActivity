@@ -9,7 +9,7 @@ process.argv.forEach(function (param, index, array) {
 
 var log = Number(params['log']) || 0;
 var repeat = Number(params['repeat']) || 0;
-const periodStart = '2016-10-25';
+const periodStart = '2017-07-25';
 const periodEnd = '2017-10-25';
 const port = process.env.PORT || 3000;
 const server = `http://127.0.0.1:${port}/`;

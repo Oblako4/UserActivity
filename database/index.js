@@ -170,8 +170,8 @@ var getUserOrderWithDetails = (orderId) => {
         return acc + item.quantity * item.listed_price;
       }, 0);
       resultOrder['items'] = result.map((item) => {
-        return {'id': item.id,
-          'item_id': item.item_id,
+        return {'id': item.item_id, //item id from Inventory DB
+          'order_id': item.order_id,
           'seller_id': item.seller_id,
           'quantity': item.quantity,
           'listed_price': item.listed_price};
@@ -207,15 +207,13 @@ var getUserOrderWithDetails = (orderId) => {
 //     "country":"USA",
 //     "zip":"49667-4393"},
 //   "items": [
-//     {"id":3,
-//      "created_at":"2017-10-26T19:09:13.000Z",
-//      "order_id":2,
-//      "item_id":9437,
+//     {"id":9437,
+//      "order_id":4,
 //      "seller_id":34,
 //      "quantity":1,
 //      "listed_price":94.81},
-//     {"id":4,
-//      "item_id":7209,
+//     {"id":7209,
+//      "order_id":4,
 //      "seller_id":36,
 //      "quantity":3,
 //      "listed_price":75.03}
