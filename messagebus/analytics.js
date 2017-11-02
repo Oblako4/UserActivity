@@ -15,11 +15,13 @@ var sendMessage = (data, queue) => {
     MessageBody: JSON.stringify(data),
     QueueUrl: queues[queue]
   };
+
   return new Promise((resolve, reject) => {
     sqs.sendMessage(params, (error, result) => {
       if (error) {
         reject(error);
       } else {
+        ('Response was sent:', data);
         resolve(result);
       }
     });
@@ -27,12 +29,25 @@ var sendMessage = (data, queue) => {
 };
 
 var handleMessage = (message, callback) => {
+  console.log('NEW MESSAGE:', message);
   var body = JSON.parse(message.Body);
-  var userId = body.userId;
+  var userId = body.user_id;
   var days = body.days;
   db.getLogins(userId, days)
     .then((result) => {
-      sendMessage(result, 'analyticsResponses');
+      var data = {};
+      data['user'] = {};
+      data['user'].id = userId;
+      var devices = result.map((device) => {
+        return {
+          'id': device.id,
+          'logged_in_at': device.logged_in_at,
+          'device_name': device.device_name,
+          'device_os': device.device_os
+        };
+      });
+      data['user'].devices = devices;
+      sendMessage(data, 'analyticsResponses');
     })
     .then((result) => {
       callback();
