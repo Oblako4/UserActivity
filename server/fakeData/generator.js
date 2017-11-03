@@ -9,7 +9,7 @@ process.argv.forEach(function (param, index, array) {
 
 var log = Number(params['log']) || 0;
 var repeat = Number(params['repeat']) || 0;
-const periodStart = '2016-10-25';
+const periodStart = '2017-07-25';
 const periodEnd = '2017-10-25';
 const port = process.env.PORT || 3000;
 const server = `http://127.0.0.1:${port}/`;
@@ -86,8 +86,8 @@ var createOrderItem = (orderId, itemId, sellerId, quantity, listedPrice, created
 //created_at, orderId, itemId, sellerId, quantity, listedPrice
   var data = {
     orderId: orderId,
-    itemId: itemId || faker.random.number({min: 1, max: 10000}),
-    sellerId: sellerId || faker.random.number({min: 1, max: 10000}),
+    itemId: itemId || faker.random.number({min: 639, max: 639}),
+    sellerId: sellerId || faker.random.number({min: 1, max: 1}),
     quantity: quantity || faker.random.number({min: 1, max: 10}),
     listedPrice: listedPrice || faker.finance.amount(2, 100, 2),
     createdAt: createdAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss'),
@@ -168,14 +168,22 @@ var createRandomOrderItem = (orderId, itemId, sellerId, quantity, listedPrice, c
     });
 };
 
-var placeRandomUserOrder = () => {
+var placeRandomUserOrder = (purchasedAt) => {
+  var orderId;
+  var userId;
+  var purchasedAt;
   return axios.get(server + 'userorder/random')
     .then((result) => {
       if (result.data !== undefined) {
-        var orderId = result.data[0].id;
-        var purchasedAt = purchasedAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss');
-        return placeUserOrder(orderId, purchasedAt);
+        orderId = result.data[0].id;
+        userId = result.data[0].user_id;
+        //var purchasedAt = purchasedAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss');
+        purchasedAt = purchasedAt || moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+        return createLogin(userId, purchasedAt);
       }
+    })
+    .then((result) => {
+      return placeUserOrder(orderId, purchasedAt);
     });
 };
 

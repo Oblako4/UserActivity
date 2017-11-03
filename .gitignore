@@ -1,4 +1,6 @@
 node_modules
 .DS_store
-awsconfig.json
+ordersconfig.json
+analyticsconfig.json
+inventoryconfig.json
 config.js
