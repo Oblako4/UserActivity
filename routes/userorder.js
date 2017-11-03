@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require('../database/index.js');
+var ordersSQS = require('../messagebus/orders.js');
 
 router.post('/', (req, res, next) => {
   var {userId, cardId, shippingAddressId, billingAddressId, deliveryType, deliveryCost, createdAt} = req.body;
@@ -59,6 +60,13 @@ router.post('/place', (req, res, next) => {
   var {orderId, purchasedAt} = req.body;
   db.placeUserOrder(orderId, purchasedAt)
     .then((result) => {
+      return db.getUserOrderWithDetails(orderId);
+    })
+    .then((result) => {
+      return ordersSQS.sendMessage(result, 'orders');
+    })
+    .then((result) => {
+      console.log('Message sent:', result.MessageId);
       return db.getUserOrder(orderId);
     })
     .then((result) => {
