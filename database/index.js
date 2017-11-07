@@ -8,6 +8,7 @@ var mysqlConnection = mysql.createConnection({
   user: process.env.DBUSER || 'root',
   password: process.env.DBPASSWORD || '',
   database: process.env.DBNAME || 'user_activity'
+  //database: process.env.DBNAME || 'user_activity_test'
 });
 
 mysqlConnection.connect((error) => {
@@ -233,6 +234,7 @@ var createSearchResult = (searchId, itemId, position) => {
 };
 
 module.exports = {
+  connection,
   createUser,
   getUser,
   createLogin,

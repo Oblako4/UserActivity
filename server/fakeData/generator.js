@@ -27,11 +27,16 @@ var parser = require('ua-parser-js');
 
 
 var createUser = (firstName, lastName, email, phone, password, createdAt) => {
+  if (phone === undefined) {
+    phone = faker.phone.phoneNumber();
+    phone = phone.replace(') ', '');
+    phone = phone.replace(/[-().]/g, '');
+  }
   var data = {
     firstName: firstName || faker.name.firstName(),
     lastName: lastName || faker.name.lastName(),
     email: email || faker.internet.email(),
-    phone: phone || faker.phone.phoneNumber(),
+    phone: phone,
     password: password || faker.internet.password(),
     createdAt: createdAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss'),
   };
@@ -86,7 +91,7 @@ var createOrderItem = (orderId, itemId, sellerId, quantity, listedPrice, created
 //created_at, orderId, itemId, sellerId, quantity, listedPrice
   var data = {
     orderId: orderId,
-    itemId: itemId || faker.random.number({min: 639, max: 639}),
+    itemId: itemId || faker.random.number({min: 639, max: 639}), //639
     sellerId: sellerId || faker.random.number({min: 1, max: 1}),
     quantity: quantity || faker.random.number({min: 1, max: 10}),
     listedPrice: listedPrice || faker.finance.amount(2, 100, 2),
@@ -113,6 +118,10 @@ var createLogin = (userId, loggedInAt, deviceName, deviceOs) => {
   var userAgentObj = parser(userAgent);
   deviceName = deviceName || ((userAgentObj.device.name || '') + ' ' + (userAgentObj.device.model || ''));
   deviceOs = deviceOs || ((userAgentObj.os.name || '') + ' ' + (userAgentObj.os.version || ''));
+  if ((deviceName === '') && (deviceOs === '')) {
+    deviceName = 'IPhone SE';
+    deviceOs = 'iOS 11.1';
+  }
   var data = {userId, loggedInAt, deviceName, deviceOs};
   return axios.post(server + 'profile/login', data);
 };
@@ -177,8 +186,8 @@ var placeRandomUserOrder = (purchasedAt) => {
       if (result.data !== undefined) {
         orderId = result.data[0].id;
         userId = result.data[0].user_id;
-        //var purchasedAt = purchasedAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss');
-        purchasedAt = purchasedAt || moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+        purchasedAt = purchasedAt || moment(faker.date.between(periodStart, periodEnd)).format('YYYY-MM-DD HH:mm:ss');
+        //purchasedAt = purchasedAt || moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
         return createLogin(userId, purchasedAt);
       }
     })
@@ -219,16 +228,16 @@ var createProfileWithOrder = () => {
 };
 
 if (repeat === 1) {
-  cron.schedule('*/10 * * * * *', function() {
+  cron.schedule('* * * * * *', function() {
     createProfileWithOrder()
       .then((result) => {
-        console.log('LOGIN createProfileWithOrder:', result.data[0]);
+        //console.log('LOGIN createProfileWithOrder:', result.data[0]);
       })
       .catch((error) => {
         console.log('createProfileWithOrder:', error.message);
       });
   });
-  cron.schedule('*/30 * * * * *', function() {
+  cron.schedule('* * * * * *', function() {
     placeRandomUserOrder()
       .then((result) => {
         console.log('placeRandomUserOrder:', result.data[0]);
@@ -237,10 +246,11 @@ if (repeat === 1) {
         console.log('placeRandomUserOrder:', error.message);
       });
   });
-  cron.schedule('*/2 * * * * *', function() {
+  cron.schedule('* * * * * *', function() {
     createRandomOrderItem()
       .then((result) => {
-        console.log('createRandomOrderItem:', result.data[0]);
+        console.log('New item');
+        //console.log('createRandomOrderItem:', result.data[0]);
       })
       .catch((error) => {
         console.log('createRandomOrderItem:', error.message);
