@@ -3,7 +3,7 @@ const Consumer = require('sqs-consumer');
 const queueConfig = require('../messagebus/config/config.js');
 const queues = queueConfig.queues;
 
-AWS.config.loadFromPath(__dirname + '/../messagebus/config/ordersconfig.json');
+AWS.config.loadFromPath(__dirname + '/../messagebus/config/queueconfig.json');
 var sqs = new AWS.SQS( {apiVersion: '2012-11-05'} );
 
 var sendMessage = (data, queue) => {

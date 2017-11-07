@@ -4,7 +4,7 @@ const queueConfig = require('../messagebus/config/config.js');
 const queues = queueConfig.queues;
 const db = require('../database/index.js');
 
-AWS.config.loadFromPath(__dirname + '/../messagebus/config/analyticsconfig.json');
+AWS.config.loadFromPath(__dirname + '/../messagebus/config/queueconfig.json');
 var sqs = new AWS.SQS( {apiVersion: '2012-11-05'} );
 
 var sendMessage = (data, queue) => {
@@ -63,10 +63,10 @@ const app = Consumer.create({
   sqs: sqs
 });
 
-// app.on('error', (err) => {
-//   console.log(err.message);
-// });
-// app.start();
+app.on('error', (err) => {
+  console.log(err.message);
+});
+app.start();
 
 module.exports = {sendMessage};
 
